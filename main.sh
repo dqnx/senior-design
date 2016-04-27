@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #//Base Variables
-#int time;
+#int Time;
 #int Temp;
 #int IRR;
 #int RiseRate;
@@ -25,77 +25,78 @@
 
 #int SimpleRiseRate;	//[C/s]
 #int RR;	//[#]
-RR = 0
+RR=0
 
 
 #constant int
-RiseRateLevel = 35 #Must be changed with test in degrees Celsius per second
-Threshold = 35	#Must be changed with test in degrees Celsius
-IRRLevel = 35	#Must be changed with test in W/area?
+RiseRateLevel=35 #Must be changed with test in degrees Celsius per second
+Threshold=35	#Must be changed with test in degrees Celsius
+IRRLevel=35	#Must be changed with test in W/area?
 
 #Determines RiseRate
-time = 34
+Time=34
 
 function thermocouple (
-Temp = ./thermo
+./thermo
 )
 
 while [ true ]; 
 do 
-	Temp1='($(thermocouple)/10)'
-	#t1 = time
+	Temp1=thermocouple
+	Temp1=$((($Temp1)/10))
 
 	sleep 1
 	
-	Temp2='($(thermocouple)/10)'
-	#t2 = time
+	Temp2=thermocouple
+	Temp2=$((($Temp2)/10))
 
-	$SimpleRiseRate = '((Temp2-Temp1)) | bc'
+	SimpleRiseRate = $(($Temp2-$Temp1)) | bc
 	if [ "$SimpleRiseRate" >= "$RiseRateLevel"]; then 
-		$RiseRate = '((RR+1))'
+		RiseRate=$(($RR+1))
 	else
-		$RR=0
+		RR=0
 	fi
 done
 
 #Main code
+
 #Checks
 
 if ["$Temp" >= "$Threshold"]; then
-	ThreshCheck = 1
-else $ThreshCheck = 0
+	ThreshCheck=1
+else ThreshCheck=0
 fi
 
 if ["$RiseRate" >= 3 ]; then
-	RRhCheck = 1
-else $RRCheck = 0
+	RRhCheck=1
+else RRCheck=0
 fi
 
 if ["$IRR" >= "$IRRLevel"]; then
-	IRRCheck = 1
-else $IRRCheck = 0
+	IRRCheck=1
+else IRRCheck=0
 fi
 
 #Display
 if ["$ThreshCheck" = 1]; then
-	ThreshDisplay = 1;
-else $Threshdisplay = 0;
+	ThreshDisplay=1;
+else Threshdisplay=0;
 fi
 
 if ["$RRCheck" = 1]; then
-	RRDisplay = 1;
-else $RRdisplay = 0;
+	RRDisplay=1;
+else RRdisplay=0;
 fi
 
 if ["$IRRCheck" = 1]; then
-	IRRDisplay = 1;
-else $IRRdisplay = 0;
+	IRRDisplay=1;
+else IRRdisplay=0;
 fi
 
 DATE=$(date +"%Y-%m-%d_%H%M")
 if [ $ThreshCheck -eq 1 ] && [ $RRCheck -eq 1 ] && [ $IRRCheck -eq 1 ]; then
 	raspistill -t 1000 -o /home/pi/Pictures/$DATE.jpg
-	gnome-open /home/pi/Pictures/$DATE.jpg
+	xdg-open /home/pi/Pictures/$DATE.jpg
 	MasterAlarm=1
 else MasterAlarm=0
 fi
